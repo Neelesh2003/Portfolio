@@ -1,8 +1,3 @@
-Got it! Here's a **README.md** file for your portfolio website project that uses **HTML, CSS, JS**, and **EmailJS**.
-
-### README.md
-
-```markdown
 # My Portfolio Website
 
 Welcome to my personal portfolio website! This website is a showcase of my skills, projects, and experiences. It is built using **HTML**, **CSS**, and **JavaScript** for the frontend, with **EmailJS** integrated to send messages from the contact form directly to my email.
@@ -115,5 +110,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### Customization:
 - Replace the `yourusername/my-portfolio.git` with your actual GitHub repository URL.
 - Ensure that the **Service ID** and **Template ID** are correctly configured in the JavaScript file.
-
-Let me know if you'd like more details or if you need further modifications! 😊
