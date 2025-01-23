@@ -1,130 +1,110 @@
 $(document).ready(function() {
+  // Initialize EmailJS with your public key
+  emailjs.init("znmdwYwDCfI1R2hUZ"); // Replace with your actual public key
 
-  //sticky header
-    $(window).scroll(function() {
-      if ($(this).scrollTop() > 1) {
-        $(".header-area").addClass("sticky");
-      } else {
-        $(".header-area").removeClass("sticky");
-      }
-  
-      // Update the active section in the header
-      updateActiveSection();
-    });
-  
-    $(".header ul li a").click(function(e) {
-      e.preventDefault(); 
-  
-      var target = $(this).attr("href");
-  
-      if ($(target).hasClass("active-section")) {
-        return; 
-      }
-  
-      if (target === "#home") {
-        $("html, body").animate(
-          {
-            scrollTop: 0 
-          },
-          500
-        );
-      } else {
-        var offset = $(target).offset().top - 40; 
-  
-        $("html, body").animate(
-          {
-            scrollTop: offset
-          },
-          500
-        );
-      }
-  
-      $(".header ul li a").removeClass("active");
-      $(this).addClass("active");
-    });
-  
-
-    //Initial content revealing js
-    ScrollReveal({
-      distance: "100px",
-      duration: 2000,
-      delay: 200
-    });
-  
-    ScrollReveal().reveal(".header a, .profile-photo, .about-content, .education", {
-      origin: "left"
-    });
-    ScrollReveal().reveal(".header ul, .profile-text, .about-skills, .internship", {
-      origin: "right"
-    });
-    ScrollReveal().reveal(".project-title, .contact-title", {
-      origin: "top"
-    });
-    ScrollReveal().reveal(".projects, .contact", {
-      origin: "bottom"
-    });
-
-  //contact form to excel sheet
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzUSaaX3XmlE5m9YLOHOBrRuCh2Ohv49N9bs4bew7xPd1qlgpvXtnudDs5Xhp3jF-Fx/exec';
-  const form = document.forms['submitToGoogleSheet']
-  const msg = document.getElementById("msg")
-
-  form.addEventListener('submit', e => {
-      e.preventDefault()
-      fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-          .then(response => {
-              msg.innerHTML = "Message sent successfully"
-              setTimeout(function () {
-                  msg.innerHTML = ""
-              }, 5000)
-              form.reset()
-          })
-          .catch(error => console.error('Error!', error.message))
-  })
-    
+  // Handle the hamburger menu click (open/close drawer)
+  $('#menu_icon').click(function() {
+      $('#drawer').toggleClass('active');
   });
-  
-  function updateActiveSection() {
-    var scrollPosition = $(window).scrollTop();
-  
-    // Checking if scroll position is at the top of the page
-    if (scrollPosition === 0) {
-      $(".header ul li a").removeClass("active");
-      $(".header ul li a[href='#home']").addClass("active");
-      return;
-    }
-  
-    // Iterate through each section and update the active class in the header
-    $("section").each(function() {
-      var target = $(this).attr("id");
-      var offset = $(this).offset().top;
-      var height = $(this).outerHeight();
-  
-      if (
-        scrollPosition >= offset - 40 &&
-        scrollPosition < offset + height - 40
-      ) {
-        $(".header ul li a").removeClass("active");
-        $(".header ul li a[href='#" + target + "']").addClass("active");
+
+  // Smooth scrolling when a menu item is clicked
+  $('a[href^="#"]').click(function(e) {
+      e.preventDefault();
+
+      // Get the target section
+      var target = $(this).attr('href');
+
+      // Smooth scroll to the target section
+      $('html, body').animate({
+          scrollTop: $(target).offset().top - 40  // Adjust scroll position
+      }, 500);
+
+      // Close the drawer after clicking on a menu item (for mobile)
+      if ($('#drawer').hasClass('active')) {
+          $('#drawer').removeClass('active');
       }
-    });
+  });
+
+  // Close drawer when clicking outside of it (for mobile)
+  $(document).click(function(event) {
+      if (!$(event.target).closest('#drawer, #menu_icon').length) {
+          $('#drawer').removeClass('active');
+      }
+  });
+
+  // Prevent drawer from closing when clicking inside it
+  $('#drawer').click(function(e) {
+      e.stopPropagation();
+  });
+
+  // EmailJS Form Submission
+  $("#contact-form").submit(function(e) {
+      e.preventDefault();  // Prevent default form submission
+
+      // Log form data to check it's correctly populated
+      var name = $('#name').val();
+      var email = $('#email').val();
+      var subject = $('#subject').val();
+      var message = $('#message').val();
+      
+      console.log(name, email, subject, message);  // Log to check the values
+
+      if (!name || !email || !message) {
+          // Show error message if required fields are empty
+          $('#msg').text("Please fill in all required fields!").css('color', 'red');
+          return;
+      }
+
+      // Use EmailJS to send the form data
+      emailjs.sendForm('service_1ilwcxb', 'template_58qtj7i', this)
+          .then(function(response) {
+              console.log('Success:', response);
+              
+              // Show the success message in a popup
+              $('#msg').text("😊 Message sent successfully! 💯").css('margin','10px','color', 'white');
+              
+              // Show a modal popup for success
+             
+
+              // Reset the form fields
+              $('#contact-form')[0].reset();
+          }, function(error) {
+              console.log('Error:', error);
+              
+              // Show error message in case of failure
+              $('#msg').text("Oops! Something went wrong. Please try again.").css('color', 'red');
+          });
+  });
+
+  // Function to show success message popup
+  function showPopup(message) {
+      // Create popup div
+      var popup = $('<div class="popup"></div>').text(message);
+      
+      // Style the popup (you can customize these styles)
+      popup.css({
+          'position': 'fixed',
+          'top': '50%',
+          'left': '50%',
+          'transform': 'translate(-50%, -50%)',
+          'background': '#4CAF50',
+          'color': 'white',
+          'padding': '20px 30px',
+          'border-radius': '5px',
+          'box-shadow': '0 4px 8px rgba(0, 0, 0, 0.1)',
+          'font-size': '16px',
+          'text-align': 'center',
+          'z-index': '9999'
+      });
+
+      // Append to body
+      $('body').append(popup);
+
+      // Remove the popup after 3 seconds
+      setTimeout(function() {
+          popup.fadeOut(500, function() {
+              popup.remove();
+          });
+      }, 3000);
   }
-  
-  $(document).ready(function(){
-    $('#menu_icon').click(function(){
-        $('#drawer').css('width', '250px');
-    });
-    
-    $('.header-area').click(function(){
-        $('#drawer').css('width', '0');
-    });
-
-    $(window).resize(function(){
-        if ($(window).width() > 767) {
-            $('#drawer').css('width', '0');
-        }
-    });
 });
-
-
- 
